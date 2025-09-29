@@ -11,17 +11,37 @@ const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
-// Swagger setup (basic)
 const swaggerOptions = {
   swaggerDefinition: {
-    openapi: '3.0.0',
-    info: { title: 'Assignment API', version: '1.0.0', description: 'Auth + Tasks' },
-    servers: [{ url: `http://localhost:${process.env.PORT || 4000}/api/v1` }]
+    openapi: "3.0.0",
+    info: {
+      title: "Assignment API",
+      version: "1.0.0",
+      description: "Auth + Tasks",
+    },
+    servers: [{ url: "http://localhost:4000/api/v1" }],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ['./src/routes/v1/*.js', './src/controllers/*.js']
+  apis: ["./src/routes/v1/*.js"],
 };
-const specs = swaggerJsDoc(swaggerOptions);
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 
 // routes
 app.use('/api/v1/auth', v1AuthRoutes);
